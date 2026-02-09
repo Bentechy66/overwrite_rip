@@ -8,8 +8,8 @@ from markdown_it.renderer import RendererHTML
 
 # -- utils
 
-def get_output_location(page):
-    return sanitize(f"out/{page.removeprefix('pages/').split('.')[0]}.html", allow="/-_.")
+def get_output_location(page, ext="html"):
+    return sanitize(f"out/{page.removeprefix('pages/').split('.')[0]}.{ext}", allow="/-_.")
 
 def sanitize(text, allow="-_"):
     return ''.join(filter(lambda x: x in allow or x.isalnum(), text.lower().replace(" ","-")))
@@ -38,7 +38,7 @@ for page in glob.glob("pages/**/*.*", recursive=True):
     if page.endswith(".html"):
         template = env.get_template(page)
         rendered = template.render()
-    if page.endswith(".md"):
+    elif page.endswith(".md"):
         md = MarkdownIt()
 
         def render_open(renderer, tokens, idx, options, env):
@@ -56,6 +56,10 @@ for page in glob.glob("pages/**/*.*", recursive=True):
         rendered_md = md.render(open(page).read())
         template = env.get_template("templates/article.html")
         rendered = template.render(md=rendered_md)
+    else:
+        output_location = Path(get_output_location(page, ext=page.split(".")[-1]))
+        output_location.parent.mkdir(exist_ok=True, parents=True)
+        open(output_location, "wb+").write(open(page, "rb").read())
 
     output_location = Path(get_output_location(page))
     output_location.parent.mkdir(exist_ok=True, parents=True)
