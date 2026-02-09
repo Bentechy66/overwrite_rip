@@ -80,6 +80,30 @@ function animateLogo() {
     }, 80);
 }
 
-animateLogo()
+function killLogo() {
+    document.getElementById("ow").innerText = ""
+    document.getElementById("dot").innerText = ""
+    document.getElementById("rip").innerText = ""
+}
+
+if (window.screen.width >= 1000) {
+    animateLogo();
+} else {
+    killLogo();
+}
+
+let animatedLogo = false;
+
+window.addEventListener('resize', function(event) {
+    if (window.screen.width >= 1000) {
+        if (!animatedLogo) {
+            animateLogo();
+            animatedLogo = true;
+        }
+    } else {
+        killLogo();
+        animatedLogo = false;
+    }
+}, true);
 </script>
 {% endblock %}
