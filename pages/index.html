@@ -1,0 +1,85 @@
+{% extends "templates/base.html" %}
+
+{% block content %}
+<div class="hero-wrap">
+    <div class="center">
+        <div class="hero">
+            <h1 id="caret">> </h1>
+            <h1 id="ow">OVERWRITE</h1>
+            <h1 id="dot">.</h1>
+            <h1 id="rip">RIP</h1>
+            <div class="typer" id="typer"></div>
+        </div>
+        <div class="quote">
+            <h3 id="quote"></h3>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+let disclaimerFlavour = [
+    // "acquiesce to arbitrary apioforms.",
+    "agree to live long and prosper.",
+    // "agree to possible conquerment by an arbitrary alien race.",
+    // "agree to to dance like nobody's watching.",
+    "acquiesce to your likeness possibly being used as an NFT.",
+    "agree not to give up on any challenges."
+]
+const disclaimer = `By visiting this site, you agree to arbitrary cookies, agree to arbitrary storage of any data sent to my server, and ${disclaimerFlavour[Math.floor(Math.random() * disclaimerFlavour.length)]}`;
+document.getElementById("cookie").innerText = disclaimer;
+
+// commented quotes are quotes i thought are too cringe. enjoy
+let quotes = [
+    // "Mess with the best, die like the rest.",
+    // "Boot up, or shut up.",
+    // "There is no right or wrong, only fun and boring.",
+    "Love with your heart, and use your head for everything else.",
+    "Insert coin to continue...",
+    // "Log On. Hack In. Go Anywhere. Get Everything.",
+    "Hello, friend.",
+    "Engaging cyber nukes...",
+    "It's an exciting time in the world right now...",
+    "Dodge this.",
+    "Press any key to continue...",
+    "Here be dragons.",
+    "Shall we play a game?",
+    // "Nothing to see here.",
+    // "This page intentionally left blank.",
+]
+
+document.getElementById("quote").innerText = quotes[Math.floor(Math.random() * quotes.length)];
+
+const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+function animateLogo() {
+    const target =  "OVERWRITE"
+    const dot =     "         ."
+    const rip =     "          RIP"
+    let i = -20;
+
+    document.getElementById("ow").innerText = ""
+    document.getElementById("dot").innerText = ""
+    document.getElementById("rip").innerText = ""
+
+    let c = setInterval(() => {
+        i += 1;
+
+        let ticker = Math.max(Math.floor(i / 1.5), 0);
+
+        document.getElementById("ow").innerText = target.slice(0, ticker)
+        document.getElementById("dot").innerText = dot.slice(0, ticker)
+        document.getElementById("rip").innerText = rip.slice(0, ticker)
+
+        if (ticker > rip.length) {
+            clearInterval(c);
+            //document.getElementById("caret").remove()
+            //document.getElementById("typer").remove()
+        }
+    }, 80);
+}
+
+animateLogo()
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "templates/base.html" %}
+
+{% block content %}
+<div class="hero-wrap">
+    <div class="center">
+        <div class="hero">
+            <h1 id="ow">NOT </h1>
+            <h1 id="rip">FOUND</h1>
+        </div>
+        <div class="quote">
+            <h3 id="quote"></h3><br/>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+const quotes = [
+    "Not all those who wander are lost... but you are.",
+    "There is no spoon. And there's no page here, either.",
+    "Impossible. Perhaps the archives are incomplete?"
+]
+
+document.getElementById("quote").innerText = quotes[Math.floor(Math.random() * quotes.length)];
+</script>
+{% endblock %}

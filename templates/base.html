@@ -1,0 +1,205 @@
+
+
+<html>
+    <head>
+    {% block head %}
+    {% endblock %}
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cutive+Mono&display=swap');
+    
+    .hero-wrap {
+        display: flex;
+        justify-content: center;
+        height: 100%;
+        flex-direction: row;
+        text-align: center;
+    }
+    
+    body {
+        font-family: 'Cutive Mono', monospace;
+    }
+    
+    .center {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+    
+    .hero > h1 {
+        display: inline;
+        font-size: 550%;
+    }
+    
+    .quote > h3 {
+        display: inline;
+        color: #555;
+    }
+    
+    .nav-logo > div {
+        font-size: 150%;
+    }
+    
+    #rip {
+        color: rgb(221, 6, 78);
+    }
+    
+    #dot {
+        color: #eee;
+    }
+    
+    #caret {
+        color: #eee;
+    }
+    
+    #ow {
+        color: lime;
+        margin: 0;
+        padding: 0;
+    }
+    
+    #ow {
+        color: #eee;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .button {
+        background-color: #555;
+        padding: 6px;
+        border-radius: 2px;
+        color: #eee;
+        text-decoration: none;
+        transition-duration: 0.4s;
+    }
+    
+    .login {
+        border: 2px solid lime;
+    }
+    .login:hover {
+        background-color: lime;
+        color: #111;
+    }
+    
+    .signup {
+        border: 2px solid rgb(221, 6, 78);
+    }
+    .signup:hover {
+        background-color: rgb(221, 6, 78);
+    }
+    
+    .typer {
+        background-color: #eee;
+        width: 1ch;
+        font-size: 550%;
+        height: 5%;
+        display: inline-block;
+        animation: 1s blink infinite step-end;
+        margin-right: 1ch;
+    }
+    
+    @keyframes blink {
+        0% {opacity: 0%;}
+        50% {opacity: 100%;}
+        100% {opacity: 0%;}
+    }
+    
+    .nav-o {
+        color: #eee;
+    }
+    
+    .nav-rip {
+        color: rgb(221, 6, 78);
+    }
+    
+    .nav-logo > div {
+        display: inline;
+    }
+    
+    .nav-logo {
+        align-items: center;
+        display: flex;
+    }
+    
+    .nav-sep {
+        height: 0.8em;
+        width: 1px;
+        background-color: white;
+        display: inline-block !important;
+        margin: 3px;
+        padding-top: 5px;
+    }
+    
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+        align-items: center;
+    }
+    
+    .button {
+        text-align: center;
+    }
+    
+    .nav-logo {
+        cursor: pointer;
+    }
+
+    @keyframes fadeDelayed {
+        0% { opacity: 0%; }
+        40% { opacity: 0%; }
+        100% { opacity: 100% }
+    }
+
+    .cookies {
+        bottom: 15px;
+        color: #444;
+        position: absolute;
+        text-align: center;
+        width: 100vw;
+        font-size: 90%;
+        opacity: 0%;
+        animation: fadeDelayed 10s ease forwards
+    }
+
+    .middle-buttons > * {
+        color: #eee;
+    }
+
+    .nav-menu-sep {
+        display: inline;
+    }
+    
+    body {
+        background-color: #111;
+        overflow: hidden;
+    }
+    </style>
+    <title>OverwriteRIP</title>
+    </head>
+    <body>
+        <div class="navbar">
+            <div class="nav-logo" onclick="document.location = '/'">
+                <div class="nav-o">O</div>
+                <div class="nav-sep"></div>
+                <div class="nav-rip">RIP</div>
+            </div>
+            <div class="middle-buttons">
+                <a href="/articles">Articles</a>
+                <p class="nav-menu-sep">|</p>
+                <a href="/challenges">Challenges</a>
+            </div>
+            <div class="auth-buttons">
+                <!-- <a href="/login" class="button login">Login</a>
+                <a href="/signup" class="button signup">Sign Up</a> -->
+            </div>
+        </div>
+        {% block content %}
+        {% endblock %}
+        <div class="cookies" id="cookie">This site uses cookies.</div>
+    </body>
+    {% block script %}
+    {% endblock %}
+    </html>
+    

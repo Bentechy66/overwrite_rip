@@ -1,0 +1,33 @@
+{% extends "templates/base.html" %}
+
+{% block head %}
+<style>
+    .wrap {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        flex-direction: column;
+        color: white;
+        flex-grow: 1;
+        margin-top: 5em;
+        margin-left: 5em;
+    }
+
+    .wrap > ul > li > a {
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <h1>
+        Challenges
+    </h1>
+    <ul>
+    {% for challenge in get_challenges() %}
+        <li><a href="{{ challenge.path }}">{{ challenge.name }}</a></li>
+    {% endfor %}
+    </ul>
+</div>
+{% endblock %}

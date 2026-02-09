@@ -1,0 +1,57 @@
+{% extends "templates/base.html" %}
+
+{% block head %}
+<style>
+    .article-wrap-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .article-wrap {
+        color: #eee;
+        max-width: 800px;
+    }
+
+    body {
+        overflow: scroll !important;
+    }
+
+    .article-wrap > * > a {
+        color: rgb(221, 6, 78);
+        text-decoration: none;
+    }
+
+    a {
+        color: rgb(221, 6, 78);
+    }
+
+    pre {
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+        background-color: #353435;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    :not(pre) > code {
+        background-color: #353435;
+        padding-left: 5px;
+        padding-right: 5px;
+        border-radius: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="article-wrap-wrap">
+    <div class="article-wrap">
+        {{ md }}
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+{% endblock %}
