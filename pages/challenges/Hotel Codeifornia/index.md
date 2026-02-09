@@ -15,7 +15,7 @@ sign: 6505f4751dd1d41f1820f421071ff63b9389386f15df6c592726166f062a24d617086fab9d
 ## Files
 We managed to recover both the binary that's running on the server and the public key used to verify the signatures:
  - [pubkey.pem](pubkey.pem)
- - [hotel_codeifornia](hotel_codeifornia)
+ - [hotel_codeifornia.elf](hotel_codeifornia.elf)
 
 ## Verify your solution
 You should find a way to execute arbitrary code, only through interacting with stdin/stdout of hotel_codeifornia. You should place the pubkey in the same directory as the exe. You may not patch the binary or replace the public key.
