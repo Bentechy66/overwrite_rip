@@ -16,11 +16,11 @@ def sanitize(text, allow="-_"):
 
 def get_articles():
     for file in glob.glob("pages/articles/*.md"):
-        yield {"path": get_output_location(file), "name": file.split("/")[-1].removesuffix(".md")}
+        yield {"path": get_output_location(file).removeprefix("out/"), "name": file.split("/")[-1].removesuffix(".md")}
 
 def get_challenges():
     for file in glob.glob("pages/challenges/**/*.md"):
-        yield {"path": get_output_location(file), "name": file.split("/")[-2].removesuffix(".md")}
+        yield {"path": get_output_location(file).removeprefix("out/"), "name": file.split("/")[-2].removesuffix(".md")}
 
 # -- actual build
 
