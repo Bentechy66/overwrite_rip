@@ -35,10 +35,15 @@ if os.path.exists("out/"):
 os.mkdir("out")
 
 for page in glob.glob("pages/**/*.*", recursive=True):
+    write_again = True
+    
+    print(f"Rendering {page}")
     if page.endswith(".html"):
+        print("Rendering HTML")
         template = env.get_template(page)
         rendered = template.render()
     elif page.endswith(".md"):
+        print("Rendering Markdown")
         md = MarkdownIt()
 
         def render_open(renderer, tokens, idx, options, env):
@@ -61,7 +66,10 @@ for page in glob.glob("pages/**/*.*", recursive=True):
         output_location.parent.mkdir(exist_ok=True, parents=True)
         open(output_location, "wb+").write(open(page, "rb").read())
 
-    output_location = Path(get_output_location(page))
-    output_location.parent.mkdir(exist_ok=True, parents=True)
+        write_again = False
 
-    open(output_location, "w+").write(rendered)
+    if write_again:
+        output_location = Path(get_output_location(page))
+        output_location.parent.mkdir(exist_ok=True, parents=True)
+    
+        open(output_location, "w+").write(rendered)
