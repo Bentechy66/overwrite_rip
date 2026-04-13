@@ -130,6 +130,14 @@ updateBadgeRowY();
 prefillBadges();
 requestAnimationFrame(updateBadgeRowPosition);
 
+setTimeout(() => {
+    updateBadgeRowY();
+}, 100)
+
+setTimeout(() => {
+    updateBadgeRowY();
+}, 5000)
+
 window.addEventListener('resize', () => {
     xPos = 0;
     lastTimestamp = null;
