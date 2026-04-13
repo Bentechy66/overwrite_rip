@@ -67,8 +67,8 @@ const updateBadgeRowPosition = (timestamp) => {
         const src = badgePaths[i % badgePaths.length];
         i += 1;
         const url = src.slice(0, -4);
-        if (url.includes("URL_")) {
-            badge_row.innerHTML += `<a href="https://${url.split("URL_")[1].replaceAll('_', '.')}"><img class='badge' src='${src}'></a>`;
+        if (url.includes("url_")) {
+            badge_row.innerHTML += `<a href="https://${url.split("url_")[1].replaceAll('_', '.')}"><img class='badge' src='${src}'></a>`;
         } else {
             badge_row.innerHTML += `<img class='badge' src='${src}'>`;
         }
