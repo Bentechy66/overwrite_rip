@@ -30,6 +30,9 @@ env = Environment(
 )
 env.globals.update(get_articles=get_articles, get_challenges=get_challenges)
 
+badge_paths = [i.removeprefix("pages/") for i in glob.glob("pages/88x31s/*")]
+print(badge_paths)
+
 if os.path.exists("out/"):
     shutil.rmtree("out/")
 os.mkdir("out")
@@ -41,7 +44,7 @@ for page in glob.glob("pages/**/*.*", recursive=True):
     if page.endswith(".html"):
         print("Rendering HTML")
         template = env.get_template(page)
-        rendered = template.render()
+        rendered = template.render({"badge_paths": badge_paths})
     elif page.endswith(".md"):
         print("Rendering Markdown")
         md = MarkdownIt()

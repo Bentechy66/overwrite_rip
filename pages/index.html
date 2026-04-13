@@ -15,10 +15,70 @@
         </div>
     </div>
 </div>
+<div class="badge-clip">
+    <div class="badge-collection"></div>
+</div>
+<style>
+    .badge-clip {
+        position: fixed;
+        left: 0;
+        width: 100vw;
+        overflow: hidden;
+        /* pointer-events: none; */
+    }
+
+    .badge-collection {
+        color: white;
+        white-space: nowrap;
+        will-change: transform;
+        display: inline-block;
+        animation: fadeDelayed 10s ease forwards;
+    }
+
+    .badge {
+        margin-right: 15px;
+    }
+</style>
 {% endblock %}
 
 {% block script %}
 <script>
+const badgePaths = [
+    {% for path in badge_paths %}
+        "{{ path }}",
+    {% endfor %}
+]
+
+
+let i = 0;
+
+const updateBadgeRowPosition = (timestamp) => {
+    const top = document.querySelector(".quote").getBoundingClientRect().bottom;
+    const bottom = document.querySelector(".cookies").getBoundingClientRect().top;
+    const clip = document.querySelector(".badge-clip");
+    const badge_row = document.querySelector(".badge-collection");
+
+    clip.style.top = (((bottom - top) / 2) + top) + "px";
+
+    const xPos = -(1000 * (timestamp / 20000));
+    badge_row.style.transform = `translateX(${xPos}px)`;
+
+    if (badge_row.getBoundingClientRect().right < window.innerWidth + 10) {
+        const src = badgePaths[i % badgePaths.length];
+        i += 1;
+        const url = src.slice(0, -4);
+        if (url.includes("URL_")) {
+            badge_row.innerHTML += `<a href="https://${url.split("URL_")[1].replaceAll('_', '.')}"><img class='badge' src='${src}'></a>`;
+        } else {
+            badge_row.innerHTML += `<img class='badge' src='${src}'>`;
+        }
+    }
+
+    requestAnimationFrame(updateBadgeRowPosition);
+}
+
+requestAnimationFrame(updateBadgeRowPosition);
+
 let disclaimerFlavour = [
     // "acquiesce to arbitrary apioforms.",
     "agree to live long and prosper.",
