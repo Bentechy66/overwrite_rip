@@ -38,6 +38,10 @@
     .badge {
         margin-right: 15px;
     }
+
+    .badge-strip {
+        display: inline-block;
+    }
 </style>
 {% endblock %}
 
@@ -49,55 +53,100 @@ const badgePaths = [
     {% endfor %}
 ]
 
-
 let i = 0;
 
-const updateBadgeRowPosition = (timestamp) => {
+const makeBadge = (index) => {
+    const src = badgePaths[index];
+    const url = src.slice(0, -4);
+    const el = url.includes("url_") ? document.createElement("a") : document.createElement("span");
+    if (url.includes("url_")) {
+        el.href = `https://${url.split("url_")[1].replaceAll('_', '.')}`;
+    }
+    const img = document.createElement("img");
+    img.className = "badge";
+    img.src = src;
+    el.appendChild(img);
+    return el;
+};
+
+const badge_row = document.querySelector(".badge-collection");
+
+const prefillBadges = () => {
+    badge_row.innerHTML = "";
+    i = 0;
+
+    const strip = document.createElement("span");
+    strip.className = "badge-strip";
+    badge_row.appendChild(strip);
+
+    // Force into DOM so scrollWidth is measurable, then fill until it overflows
+    while (strip.scrollWidth < window.innerWidth + 200) {
+        strip.appendChild(makeBadge(i % badgePaths.length));
+        i += 1;
+    }
+
+    const strip2 = strip.cloneNode(true);
+    badge_row.appendChild(strip2);
+};
+
+const updateBadgeRowY = () => {
     const top = document.querySelector(".quote").getBoundingClientRect().bottom;
     const bottom = document.querySelector(".cookies").getBoundingClientRect().top;
     const clip = document.querySelector(".badge-clip");
-    const badge_row = document.querySelector(".badge-collection");
-
     clip.style.top = (((bottom - top) / 2) + top) + "px";
+};
 
-    const xPos = -(1000 * (timestamp / 20000));
-    badge_row.style.transform = `translateX(${xPos}px)`;
+const SCROLL_SPEED = 50;
+let lastTimestamp = null;
+let xPos = 0;
 
-    while (badge_row.getBoundingClientRect().right < window.innerWidth + 10) {
-        const src = badgePaths[i % badgePaths.length];
-        i += 1;
-        const url = src.slice(0, -4);
-        if (url.includes("url_")) {
-            badge_row.innerHTML += `<a href="https://${url.split("url_")[1].replaceAll('_', '.')}"><img class='badge' src='${src}'></a>`;
-        } else {
-            badge_row.innerHTML += `<img class='badge' src='${src}'>`;
+const updateBadgeRowPosition = (timestamp) => {
+    if (document.hidden) {
+        lastTimestamp = null;
+        requestAnimationFrame(updateBadgeRowPosition);
+        return;
+    }
+
+    if (lastTimestamp !== null) {
+        const delta = (timestamp - lastTimestamp) / 1000;
+        xPos -= SCROLL_SPEED * delta;
+    }
+    lastTimestamp = timestamp;
+
+    const strip = badge_row.querySelector(".badge-strip");
+    if (strip) {
+        const stripWidth = strip.scrollWidth;
+        if (xPos <= -stripWidth) {
+            xPos += stripWidth;
         }
     }
 
+    badge_row.style.transform = `translateX(${xPos}px)`;
     requestAnimationFrame(updateBadgeRowPosition);
-}
+};
 
+updateBadgeRowY();
+prefillBadges();
 requestAnimationFrame(updateBadgeRowPosition);
 
+window.addEventListener('resize', () => {
+    xPos = 0;
+    lastTimestamp = null;
+    updateBadgeRowY();
+    prefillBadges();
+});
+
 let disclaimerFlavour = [
-    // "acquiesce to arbitrary apioforms.",
     "agree to live long and prosper.",
-    // "agree to possible conquerment by an arbitrary alien race.",
-    // "agree to to dance like nobody's watching.",
     "acquiesce to your likeness possibly being used as an NFT.",
     "agree not to give up on any challenges."
 ]
 const disclaimer = `By visiting this site, you agree to arbitrary cookies, agree to arbitrary storage of any data sent to my server, and ${disclaimerFlavour[Math.floor(Math.random() * disclaimerFlavour.length)]}`;
 document.getElementById("cookie").innerText = disclaimer;
 
-// commented quotes are quotes i thought are too cringe. enjoy
 let quotes = [
-    // "Mess with the best, die like the rest.",
-    // "Boot up, or shut up.",
-    // "There is no right or wrong, only fun and boring.",
     "Love with your heart, and use your head for everything else.",
     "Insert coin to continue...",
-    // "Log On. Hack In. Go Anywhere. Get Everything.",
     "Hello, friend.",
     "Engaging cyber nukes...",
     "It's an exciting time in the world right now...",
@@ -105,13 +154,11 @@ let quotes = [
     "Press any key to continue...",
     "Here be dragons.",
     "Shall we play a game?",
-    // "Nothing to see here.",
-    // "This page intentionally left blank.",
 ]
 
 document.getElementById("quote").innerText = quotes[Math.floor(Math.random() * quotes.length)];
 
-const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 function animateLogo() {
     const target =  "OVERWRITE"
@@ -134,8 +181,6 @@ function animateLogo() {
 
         if (ticker > rip.length) {
             clearInterval(c);
-            //document.getElementById("caret").remove()
-            //document.getElementById("typer").remove()
         }
     }, 80);
 }
