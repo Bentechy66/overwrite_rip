@@ -30,7 +30,7 @@ env = Environment(
 )
 env.globals.update(get_articles=get_articles, get_challenges=get_challenges)
 
-badge_paths = [i.removeprefix("pages/").lower() for i in glob.glob("pages/88x31s/*")]
+badge_paths = [i.removeprefix("pages/").lower() for i in glob.glob("pages/88x31s/*") if "README" not in i]
 print(badge_paths)
 
 if os.path.exists("out/"):
