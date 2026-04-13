@@ -67,6 +67,9 @@ for page in glob.glob("pages/**/*.*", recursive=True):
     else:
         output_location = Path(get_output_location(page, ext=page.split(".")[-1]))
         output_location.parent.mkdir(exist_ok=True, parents=True)
+
+        print(f"copying {page} over to {output_location}")
+
         open(output_location, "wb+").write(open(page, "rb").read())
 
         write_again = False
