@@ -63,7 +63,7 @@ const updateBadgeRowPosition = (timestamp) => {
     const xPos = -(1000 * (timestamp / 20000));
     badge_row.style.transform = `translateX(${xPos}px)`;
 
-    if (badge_row.getBoundingClientRect().right < window.innerWidth + 10) {
+    while (badge_row.getBoundingClientRect().right < window.innerWidth + 10) {
         const src = badgePaths[i % badgePaths.length];
         i += 1;
         const url = src.slice(0, -4);
