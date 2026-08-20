@@ -2,7 +2,7 @@
 One of our team wants to use this Really Awesome Console Application, but they don't want to pay for it. Can you help them keygen it (without patching the binary) and generate a license key for the username "John Smith"?
 
 ## Files
- - [really_awesome_console_application.exe](really_awesome_console_application.pem)
+ - [really_awesome_console_application.exe](really_awesome_console_application.exe)
 
 ## Verify your solution
 To win: Simply generate a valid key for the program - without patching it.
