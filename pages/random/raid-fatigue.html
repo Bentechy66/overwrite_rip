@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Raid XP Balance Curve</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+
+    --bg-deep: #11131b;
+    --bg-panel: #1a1e29;
+    --bg-panel-2: #212736;
+    --border: #2b3142;
+    --text-primary: #edeff3;
+    --text-muted: #8a93a8;
+    --text-faint: #5b6376;
+    --accent-ui: #e3b23c;
+
+    --accent-fire: #e2703a;
+    --accent-frost: #4fb0c6;
+    --accent-void: #9b6bd1;
+    --accent-earth: #7cb86a;
+    --accent-storm: #d1495b;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *, *::before, *::after { box-sizing: inherit; }
+  html, body { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+    min-height: 100%;
+  }
+
+  .page { max-width: 1180px; margin: 0 auto; padding: 40px clamp(16px,4vw,48px) 72px; }
+
+  header { max-width: 780px; margin-bottom: 30px; }
+  h1 { font-size: clamp(26px,4vw,38px); font-weight: 600; letter-spacing: -0.01em; margin: 0 0 10px; }
+  .subtitle { color: var(--text-muted); font-size: 16px; line-height: 1.55; margin: 0; }
+  .example-note { color: var(--text-faint); font-size: 12.5px; margin-top: 8px; }
+
+  .layout { display: grid; grid-template-columns: minmax(300px, 430px) 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; margin-bottom: 22px; }
+  .panel h2 { font-size: 14.5px; font-weight: 600; margin: 0 0 16px; letter-spacing: 0.01em; }
+  .panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .panel-head h2 { margin: 0; }
+
+  .formula-box {
+    background: var(--bg-panel-2); border-radius: 10px; padding: 16px 18px;
+    font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.75;
+    color: #f3d9c4; margin-bottom: 16px;
+  }
+  .formula-box .sub { color: var(--text-muted); font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; display: block; margin-top: 6px; }
+
+  .control { margin-bottom: 18px; }
+  .control:last-child { margin-bottom: 0; }
+  .control-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .control-row .name { font-size: 13.5px; color: var(--text-primary); font-weight: 500; }
+  .control-row .val { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-ui); text-align: right; }
+  input[type=range] { width: 100%; accent-color: var(--accent-ui); height: 4px; }
+
+  .chart-wrap { width: 100%; }
+  .chart-wrap svg { width: 100%; height: auto; display: block; }
+  .chart-legend { font-size: 12px; color: var(--text-faint); margin-top: 10px; line-height: 1.5; }
+
+  .preset-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .preset-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+    border-radius: 8px; padding: 8px 12px; font-family: 'Space Grotesk', sans-serif;
+    font-size: 12.5px; cursor: pointer;
+  }
+  .preset-btn:hover { border-color: var(--accent-ui); color: var(--text-primary); }
+
+  .raid-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px,1fr)); gap: 14px; }
+  .raid-card {
+    background: var(--bg-panel-2); border: 1px solid var(--border); border-top: 3px solid var(--raid-color);
+    border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .raid-card .id-row { display: flex; align-items: center; gap: 7px; }
+  .raid-card .swatch { width: 9px; height: 9px; background: var(--raid-color); transform: rotate(45deg); flex-shrink: 0; }
+  .raid-card .element { font-size: 11.5px; color: var(--raid-color); font-weight: 600; }
+  .raid-card .name { font-size: 15px; font-weight: 600; margin: 2px 0 4px; }
+
+  .raid-card .count-row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
+  .raid-card .count-row .num-input {
+    width: 66px; background: var(--bg-deep); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 12.5px; padding: 3px 6px; text-align: right;
+  }
+  .raid-card input[type=range] { margin-bottom: 6px; }
+  .raid-card .steppers { display: flex; gap: 6px; margin-bottom: 4px; }
+  .raid-card .steppers button {
+    flex: 1; background: var(--bg-deep); border: 1px solid var(--border); color: var(--text-muted);
+    border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; padding: 5px 0; cursor: pointer;
+  }
+  .raid-card .steppers button:hover { color: var(--text-primary); border-color: var(--raid-color); }
+
+  .raid-card .stat-line { font-size: 12px; color: var(--text-faint); display: flex; justify-content: space-between; }
+  .raid-card .stat-line span:last-child { font-family: 'JetBrains Mono', monospace; color: var(--text-muted); }
+
+  .raid-card .mult-row { display: flex; align-items: baseline; justify-content: space-between; margin-top: 4px; }
+  .raid-card .mult-value { font-family: 'JetBrains Mono', monospace; font-size: 27px; font-weight: 600; }
+  .raid-card .mult-label { font-size: 10.5px; color: var(--text-faint); }
+  .raid-card .next-xp { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--text-faint); }
+
+  .note { max-width: 800px; color: var(--text-muted); font-size: 13.5px; line-height: 1.65; margin-top: 4px;}
+  .note strong { color: var(--text-primary); font-weight: 600; }
+  .note + .note { margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>XP balance curve, by lifetime totals</h1>
+    <p class="subtitle">Each raid's XP depends on how many times you've completed it versus your average completion count on the other four — not on recent streaks. Balanced play stays at full XP forever; lopsided play drifts down smoothly.</p>
+  </header>
+
+  <div class="layout">
+    <div>
+      <div class="panel">
+        <h2>The formula</h2>
+        <div class="formula-box">
+          diff = max(0, completions<sub>i</sub> − avg(completions of other 4))
+          <span class="sub">how far this raid's total is ahead of your average on the rest</span>
+          multiplier = floor + (1 − floor) × D / (D + diff)
+          <span class="sub">D = extra completions needed to roughly halve the bonus above floor</span>
+        </div>
+
+        <div class="control">
+          <div class="control-row"><span class="name">D (half-life)</span><span class="val" id="dVal"></span></div>
+          <input type="range" id="dSlider" min="50" max="1200" step="25" value="200">
+        </div>
+        <div class="control">
+          <div class="control-row"><span class="name">Floor</span><span class="val" id="floorVal"></span></div>
+          <input type="range" id="floorSlider" min="0" max="0.8" step="0.05" value="0.5">
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Multiplier vs. completions above average</h2>
+        <div class="chart-wrap">
+          <svg id="chart" viewBox="0 0 600 260"></svg>
+        </div>
+        <p class="chart-legend">Flat at 100% while a raid is at or below the others' average. Dots show where each raid sits right now — drag the sliders on the right and watch them slide along the curve.</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Try some distributions</h2>
+        </div>
+        <div class="preset-row">
+          <button class="preset-btn" data-preset="default">Reset (0 each)</button>
+          <button class="preset-btn" data-preset="spam">Spam one raid</button>
+          <button class="preset-btn" data-preset="alternate">Alternate two raids</button>
+          <button class="preset-btn" data-preset="spread">Spread across all five</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Completions per raid</h2>
+        <div class="raid-grid" id="raidGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note"><strong>Why alternating two raids doesn't beat the system:</strong> click "Alternate two raids" — both farmed raids land in the mid-50%s, not 100%. The other three you're ignoring keep pulling their own average down, and yours up, relative to them. Only "Spread across all five" holds every raid at 100%, since it makes diff = 0 everywhere.</div>
+  <div class="note"><strong>Tuning:</strong> lower <em>D</em> makes the penalty bite sooner (fewer extra completions needed to feel it); raising the <em>floor</em> keeps heavy grinding of one raid worth something for loot even once XP has bottomed out. Base XP per completion is set to 1450 in this demo — swap in your real number, the curve's shape is what matters.</div>
+
+</div>
+
+<script>
+  var RAIDS = [
+    { id: 'notg', name: 'Nest of the Grootslangs',  element: 'Grootslang Wyrmling'    },
+    { id: 'nol',  name: "Orphion's Nexus of Light",  element: 'Orphion, Fading Light'  },
+    { id: 'tcc',  name: 'The Canyon Colossus',       element: 'The Canyon Colossus'    },
+    { id: 'tna',  name: 'The Nameless Anomaly',      element: 'The Nameless'           },
+    { id: 'twp',  name: 'The Wartorn Palace',        element: 'Anathema'               }
+  ];
+  var RAID_HEX = { notg:'#7cb86a', nol:'#e3b23c', tcc:'#e2703a', tna:'#9b6bd1', twp:'#d1495b' };
+
+  var BASE_XP = 1450;
+  var SLIDER_MAX = 2000;
+  var params = { D: 200, floor: 0.5 };
+  var completions = { notg: 0, nol: 0, tcc: 0, tna: 0, twp: 0 };
+
+  var PRESETS = {
+    default:   { notg: 0, nol: 0, tcc: 0, tna: 0, twp: 0 },
+    spam:      { notg: 1200, nol: 50, tcc: 50, tna: 50, twp: 50 },
+    alternate: { notg: 600, nol: 600, tcc: 50, tna: 50, twp: 50 },
+    spread:    { notg: 300, nol: 300, tcc: 300, tna: 300, twp: 300 }
+  };
+
+  function avgOfOthers(id){
+    var sum = 0;
+    RAIDS.forEach(function(rd){ if (rd.id !== id) sum += completions[rd.id]; });
+    return sum / (RAIDS.length - 1);
+  }
+
+  function diffFor(id){
+    return Math.max(0, completions[id] - avgOfOthers(id));
+  }
+
+  function multiplierForDiff(diff){
+    return params.floor + (1 - params.floor) * params.D / (params.D + diff);
+  }
+
+  // ---- Chart geometry ----
+  var VB_W = 600, VB_H = 260, PAD_L = 46, PAD_R = 16, PAD_T = 14, PAD_B = 32;
+  var X_MIN = -300, X_MAX = 2000;
+  var CW = VB_W - PAD_L - PAD_R, CH = VB_H - PAD_T - PAD_B;
+  function xScale(diff){ return PAD_L + (diff - X_MIN) / (X_MAX - X_MIN) * CW; }
+  function yScale(m){ return PAD_T + (1 - m) * CH; }
+
+  function buildChartStatic(){
+    var svg = document.getElementById('chart');
+    var parts = [];
+    [0, 0.25, 0.5, 0.75, 1].forEach(function(m){
+      var y = yScale(m);
+      parts.push('<line x1="' + PAD_L + '" y1="' + y + '" x2="' + (PAD_L + CW) + '" y2="' + y + '" stroke="#2b3142" stroke-width="1" />');
+      parts.push('<text x="' + (PAD_L - 8) + '" y="' + (y + 4) + '" text-anchor="end" font-size="10.5" font-family="JetBrains Mono, monospace" fill="#5b6376">' + Math.round(m * 100) + '%</text>');
+    });
+    [-300, 0, 500, 1000, 1500, 2000].forEach(function(v){
+      var x = xScale(v);
+      parts.push('<line x1="' + x + '" y1="' + PAD_T + '" x2="' + x + '" y2="' + (PAD_T + CH) + '" stroke="#212736" stroke-width="1" />');
+      parts.push('<text x="' + x + '" y="' + (VB_H - 8) + '" text-anchor="middle" font-size="10.5" font-family="JetBrains Mono, monospace" fill="#5b6376">' + v + '</text>');
+    });
+    svg.innerHTML = parts.join('') +
+      '<path id="curvePath" fill="none" stroke="#e3b23c" stroke-width="2.5" />' +
+      RAIDS.map(function(rd){ return '<circle id="dot-' + rd.id + '" r="6" fill="' + RAID_HEX[rd.id] + '" stroke="#11131b" stroke-width="2" />'; }).join('');
+  }
+
+  function renderChart(){
+    var d = '';
+    var step = 10;
+    for (var x = X_MIN; x <= X_MAX; x += step){
+      var effDiff = Math.max(0, x);
+      var m = multiplierForDiff(effDiff);
+      var px = xScale(x), py = yScale(m);
+      d += (x === X_MIN ? 'M' : 'L') + px.toFixed(2) + ' ' + py.toFixed(2) + ' ';
+    }
+    document.getElementById('curvePath').setAttribute('d', d);
+
+    RAIDS.forEach(function(rd){
+      var diff = completions[rd.id] - avgOfOthers(rd.id);
+      var m = multiplierForDiff(Math.max(0, diff));
+      var dot = document.getElementById('dot-' + rd.id);
+      dot.setAttribute('cx', xScale(Math.max(X_MIN, Math.min(X_MAX, diff))));
+      dot.setAttribute('cy', yScale(m));
+    });
+  }
+
+  function renderCards(){
+    RAIDS.forEach(function(rd){
+      var avg = avgOfOthers(rd.id);
+      var diff = diffFor(rd.id);
+      var m = multiplierForDiff(diff);
+      var xp = Math.round(BASE_XP * m);
+
+      document.getElementById('slider-' + rd.id).value = completions[rd.id];
+      document.getElementById('num-' + rd.id).value = completions[rd.id];
+      document.getElementById('avg-' + rd.id).textContent = avg.toFixed(0);
+      document.getElementById('diff-' + rd.id).textContent = '+' + diff.toFixed(0);
+      document.getElementById('mult-' + rd.id).textContent = Math.round(m * 100) + '%';
+      document.getElementById('nextxp-' + rd.id).textContent = 'Next completion: ' + xp.toLocaleString() + ' xp';
+    });
+  }
+
+  function setCompletions(id, value){
+    value = Math.max(0, Math.min(SLIDER_MAX, Math.round(value)));
+    completions[id] = value;
+    renderAll();
+  }
+
+  function applyPreset(name){
+    var p = PRESETS[name];
+    RAIDS.forEach(function(rd){ completions[rd.id] = p[rd.id]; });
+    renderAll();
+  }
+
+  function renderAll(){
+    renderChart();
+    renderCards();
+  }
+
+  function labelSliders(){
+    document.getElementById('dVal').textContent = params.D + ' completions';
+    document.getElementById('floorVal').textContent = Math.round(params.floor * 100) + '% minimum';
+  }
+
+  function buildRaidGrid(){
+    var grid = document.getElementById('raidGrid');
+    grid.innerHTML = RAIDS.map(function(rd){
+      return '<div class="raid-card" style="--raid-color:' + RAID_HEX[rd.id] + '">' +
+        '<div class="id-row"><span class="swatch"></span><span class="element">Boss: ' + rd.element + '</span></div>' +
+        '<div class="name">' + rd.name + '</div>' +
+        '<div class="count-row"><span>Times completed</span><input class="num-input" type="number" min="0" max="' + SLIDER_MAX + '" id="num-' + rd.id + '"></div>' +
+        '<input type="range" min="0" max="' + SLIDER_MAX + '" step="10" id="slider-' + rd.id + '">' +
+        '<div class="steppers">' +
+          '<button type="button" data-id="' + rd.id + '" data-step="1">+1</button>' +
+          '<button type="button" data-id="' + rd.id + '" data-step="25">+25</button>' +
+          '<button type="button" data-id="' + rd.id + '" data-step="100">+100</button>' +
+        '</div>' +
+        '<div class="stat-line"><span>Avg. of other four</span><span id="avg-' + rd.id + '"></span></div>' +
+        '<div class="stat-line"><span>Diff above average</span><span id="diff-' + rd.id + '"></span></div>' +
+        '<div class="mult-row"><span class="mult-value" id="mult-' + rd.id + '"></span><span class="mult-label">current multiplier</span></div>' +
+        '<div class="next-xp" id="nextxp-' + rd.id + '"></div>' +
+        '</div>';
+    }).join('');
+
+    RAIDS.forEach(function(rd){
+      document.getElementById('slider-' + rd.id).addEventListener('input', function(e){
+        setCompletions(rd.id, parseFloat(e.target.value));
+      });
+      document.getElementById('num-' + rd.id).addEventListener('change', function(e){
+        setCompletions(rd.id, parseFloat(e.target.value) || 0);
+      });
+    });
+
+    grid.querySelectorAll('.steppers button').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-id');
+        var step = parseInt(btn.getAttribute('data-step'), 10);
+        setCompletions(id, completions[id] + step);
+      });
+    });
+  }
+
+  document.getElementById('dSlider').addEventListener('input', function(e){
+    params.D = parseFloat(e.target.value); labelSliders(); renderAll();
+  });
+  document.getElementById('floorSlider').addEventListener('input', function(e){
+    params.floor = parseFloat(e.target.value); labelSliders(); renderAll();
+  });
+  document.querySelectorAll('.preset-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ applyPreset(btn.getAttribute('data-preset')); });
+  });
+
+  buildChartStatic();
+  buildRaidGrid();
+  labelSliders();
+  renderAll();
+</script>
+</body>
+</html>
